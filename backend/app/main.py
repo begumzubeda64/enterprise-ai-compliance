@@ -7,6 +7,8 @@ from app.core.lifespan import lifespan
 from app.middleware.request_id import RequestIDMiddleware
 from app.middleware.logging import LoggingMiddleware
 
+from app.core.handlers import register_exception_handlers
+
 
 def create_app() -> FastAPI:
     app = FastAPI(
@@ -25,6 +27,8 @@ def create_app() -> FastAPI:
             "name": settings.license_name,
         },
     )
+
+    register_exception_handlers(app)
 
     app.add_middleware(LoggingMiddleware)
     app.add_middleware(RequestIDMiddleware)

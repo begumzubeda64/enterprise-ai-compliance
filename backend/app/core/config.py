@@ -3,6 +3,8 @@ from functools import lru_cache
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from pydantic import computed_field
+
 
 class Settings(BaseSettings):
     """
@@ -84,6 +86,46 @@ class Settings(BaseSettings):
         default="INFO",
         alias="LOG_LEVEL",
     )
+
+    # -----------------------------
+    # PostgreSQL
+    # -----------------------------
+    postgres_host: str = Field(
+        default="localhost",
+        alias="POSTGRES_HOST",
+    )
+
+    postgres_port: int = Field(
+        default=5433,
+        alias="POSTGRES_PORT",
+    )
+
+    postgres_db: str = Field(
+        default="compliance_db",
+        alias="POSTGRES_DB",
+    )
+
+    postgres_user: str = Field(
+        default="postgres",
+        alias="POSTGRES_USER",
+    )
+
+    postgres_password: str = Field(
+        default="postgres",
+        alias="POSTGRES_PASSWORD",
+    )
+
+    @computed_field
+    @property
+    def database_url(self) -> str:
+        return (
+            f"postgresql+psycopg://"
+            f"{self.postgres_user}:"
+            f"{self.postgres_password}@"
+            f"{self.postgres_host}:"
+            f"{self.postgres_port}/"
+            f"{self.postgres_db}"
+        )
 
 
 @lru_cache
