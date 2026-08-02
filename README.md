@@ -2,7 +2,7 @@
 
 ## Overview
 
-Enterprise AI Compliance Review Platform is a production-oriented AI application that assists compliance teams in reviewing enterprise documents against organizational policies and regulatory standards. It leverages Retrieval-Augmented Generation (RAG), workflow orchestration with LangGraph, human-in-the-loop approvals, and AWS cloud services to generate explainable, evidence-backed compliance reports.
+An AI-powered compliance assessment platform that evaluates organizational evidence against configurable compliance frameworks, generating traceable findings, recommendations, and audit-ready reports with human review. It leverages Retrieval-Augmented Generation (RAG), workflow orchestration with LangGraph, human-in-the-loop approvals, and AWS cloud services to generate explainable, evidence-backed compliance reports.
 
 The project is designed as a real-world Proof of Concept (POC) following enterprise software engineering practices rather than a simple AI demo.
 

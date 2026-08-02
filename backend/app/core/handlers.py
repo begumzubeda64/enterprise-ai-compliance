@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from app.core.exceptions import AppException
+from app.exceptions.base import AppException
 from app.core.logging import logger
 
 

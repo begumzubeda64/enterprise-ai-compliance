@@ -115,6 +115,24 @@ class Settings(BaseSettings):
         alias="POSTGRES_PASSWORD",
     )
 
+    # -----------------------------
+    # JWT Authentication
+    # -----------------------------
+
+    jwt_secret_key: str = Field(
+    alias="JWT_SECRET_KEY",
+    )
+
+    jwt_algorithm: str = Field(
+        default="HS256",
+        alias="JWT_ALGORITHM",
+    )
+
+    jwt_access_token_expire_minutes: int = Field(
+        default=30,
+        alias="JWT_ACCESS_TOKEN_EXPIRE_MINUTES",
+    )
+
     @computed_field
     @property
     def database_url(self) -> str:
