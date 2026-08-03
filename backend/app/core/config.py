@@ -1,9 +1,7 @@
 from functools import lru_cache
 
-from pydantic import Field
+from pydantic import Field, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
-from pydantic import computed_field
 
 
 class Settings(BaseSettings):
@@ -96,7 +94,7 @@ class Settings(BaseSettings):
     )
 
     postgres_port: int = Field(
-        default=5433,
+        default=5432,
         alias="POSTGRES_PORT",
     )
 
@@ -116,11 +114,10 @@ class Settings(BaseSettings):
     )
 
     # -----------------------------
-    # JWT Authentication
+    # JWT
     # -----------------------------
-
     jwt_secret_key: str = Field(
-    alias="JWT_SECRET_KEY",
+        alias="JWT_SECRET_KEY",
     )
 
     jwt_algorithm: str = Field(
@@ -131,6 +128,18 @@ class Settings(BaseSettings):
     jwt_access_token_expire_minutes: int = Field(
         default=30,
         alias="JWT_ACCESS_TOKEN_EXPIRE_MINUTES",
+    )
+
+    # -----------------------------
+    # AWS
+    # -----------------------------
+    aws_region: str = Field(
+        default="eu-north-1",
+        alias="AWS_REGION",
+    )
+
+    aws_s3_bucket_name: str = Field(
+        alias="AWS_S3_BUCKET_NAME",
     )
 
     @computed_field
@@ -149,10 +158,9 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     """
-    Cached settings instance.
-
-    Ensures configuration is loaded only once.
+    Return one cached settings instance.
     """
+
     return Settings()
 
 
