@@ -6,25 +6,27 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-from app.db.mixins import TimestampMixin
+from app.db.mixins import TimestampMixin, UUIDPrimaryKeyMixin
 from app.models.enums import UserRole
 
 if TYPE_CHECKING:
+    from app.models.compliance_project import ComplianceProject
     from app.models.organization import Organization
 
 
-class User(TimestampMixin, Base):
+class User(
+    UUIDPrimaryKeyMixin,
+    TimestampMixin,
+    Base,
+):
     __tablename__ = "users"
-
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
-        primary_key=True,
-        default=uuid.uuid4,
-    )
 
     organization_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
-        ForeignKey("organizations.id"),
+        ForeignKey(
+            "organizations.id",
+            name="fk_users_organization_id",
+        ),
         nullable=True,
         index=True,
     )
@@ -47,7 +49,10 @@ class User(TimestampMixin, Base):
     )
 
     role: Mapped[UserRole] = mapped_column(
-        Enum(UserRole, name="user_role"),
+        Enum(
+            UserRole,
+            name="user_role",
+        ),
         nullable=False,
         default=UserRole.USER,
     )
@@ -60,4 +65,10 @@ class User(TimestampMixin, Base):
 
     organization: Mapped["Organization | None"] = relationship(
         back_populates="users",
+    )
+
+    created_compliance_projects: Mapped[
+        list["ComplianceProject"]
+    ] = relationship(
+        back_populates="creator",
     )

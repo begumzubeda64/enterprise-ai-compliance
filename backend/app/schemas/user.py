@@ -14,6 +14,7 @@ class UserCreate(BaseModel):
 
 class UserResponse(BaseModel):
     id: UUID
+    organization_id: UUID | None
     email: EmailStr
     full_name: str
     role: UserRole

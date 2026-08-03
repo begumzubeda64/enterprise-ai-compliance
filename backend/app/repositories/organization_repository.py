@@ -1,11 +1,13 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.user import User
+from app.models.organization import Organization
 from app.repositories.base_repository import BaseRepository
 
 
-class UserRepository(BaseRepository[User]):
+class OrganizationRepository(
+    BaseRepository[Organization],
+):
 
     def __init__(
         self,
@@ -13,16 +15,16 @@ class UserRepository(BaseRepository[User]):
     ):
         super().__init__(
             db=db,
-            model=User,
+            model=Organization,
         )
 
-    async def get_by_email(
+    async def get_by_slug(
         self,
-        email: str,
-    ) -> User | None:
+        slug: str,
+    ) -> Organization | None:
         result = await self.db.execute(
-            select(User).where(
-                User.email == email
+            select(Organization).where(
+                Organization.slug == slug
             )
         )
 

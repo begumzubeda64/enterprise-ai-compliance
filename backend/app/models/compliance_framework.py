@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, String, Text
+from sqlalchemy import Boolean, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -8,26 +8,33 @@ from app.db.mixins import TimestampMixin, UUIDPrimaryKeyMixin
 
 if TYPE_CHECKING:
     from app.models.compliance_project import ComplianceProject
-    from app.models.user import User
+    from app.models.compliance_requirement import ComplianceRequirement
 
 
-class Organization(
+class ComplianceFramework(
     UUIDPrimaryKeyMixin,
     TimestampMixin,
     Base,
 ):
-    __tablename__ = "organizations"
+    __tablename__ = "compliance_frameworks"
+
+    __table_args__ = (
+        UniqueConstraint(
+            "name",
+            "version",
+            name="uq_compliance_frameworks_name_version",
+        ),
+    )
 
     name: Mapped[str] = mapped_column(
         String(255),
         nullable=False,
+        index=True,
     )
 
-    slug: Mapped[str] = mapped_column(
-        String(100),
-        unique=True,
+    version: Mapped[str] = mapped_column(
+        String(50),
         nullable=False,
-        index=True,
     )
 
     description: Mapped[str | None] = mapped_column(
@@ -41,11 +48,11 @@ class Organization(
         nullable=False,
     )
 
-    users: Mapped[list["User"]] = relationship(
-        back_populates="organization",
+    requirements: Mapped[list["ComplianceRequirement"]] = relationship(
+        back_populates="framework",
+        cascade="all, delete-orphan",
     )
 
     compliance_projects: Mapped[list["ComplianceProject"]] = relationship(
-        back_populates="organization",
-        cascade="all, delete-orphan",
+        back_populates="framework",
     )
