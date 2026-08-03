@@ -2,12 +2,12 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.auth.tenant import get_user_organization_id
 from app.exceptions.compliance_framework import (
     ComplianceFrameworkNotFoundException,
 )
 from app.exceptions.compliance_project import (
     ComplianceProjectNotFoundException,
-    OrganizationMembershipRequiredException,
 )
 from app.models.compliance_project import ComplianceProject
 from app.models.enums import ProjectStatus
@@ -45,14 +45,12 @@ class ComplianceProjectService:
         project_data: ComplianceProjectCreate,
         current_user: User,
     ) -> ComplianceProjectResponse:
-        organization_id = self._get_organization_id(
+        organization_id = get_user_organization_id(
             current_user
         )
 
-        framework = (
-            await self.framework_repository.get_by_id(
-                project_data.framework_id
-            )
+        framework = await self.framework_repository.get_by_id(
+            project_data.framework_id
         )
 
         if framework is None:
@@ -94,7 +92,7 @@ class ComplianceProjectService:
     ) -> PaginatedResponse[
         ComplianceProjectResponse
     ]:
-        organization_id = self._get_organization_id(
+        organization_id = get_user_organization_id(
             current_user
         )
 
@@ -124,7 +122,7 @@ class ComplianceProjectService:
         project_id: UUID,
         current_user: User,
     ) -> ComplianceProjectResponse:
-        organization_id = self._get_organization_id(
+        organization_id = get_user_organization_id(
             current_user
         )
 
@@ -144,12 +142,3 @@ class ComplianceProjectService:
         return ComplianceProjectResponse.model_validate(
             project
         )
-
-    @staticmethod
-    def _get_organization_id(
-        current_user: User,
-    ) -> UUID:
-        if current_user.organization_id is None:
-            raise OrganizationMembershipRequiredException()
-
-        return current_user.organization_id
