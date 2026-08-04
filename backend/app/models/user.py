@@ -10,6 +10,7 @@ from app.db.mixins import TimestampMixin, UUIDPrimaryKeyMixin
 from app.models.enums import UserRole
 
 if TYPE_CHECKING:
+    from app.models.compliance_document import ComplianceDocument
     from app.models.compliance_project import ComplianceProject
     from app.models.organization import Organization
 
@@ -71,4 +72,10 @@ class User(
         list["ComplianceProject"]
     ] = relationship(
         back_populates="creator",
+    )
+
+    uploaded_compliance_documents: Mapped[
+        list["ComplianceDocument"]
+    ] = relationship(
+        back_populates="uploader",
     )

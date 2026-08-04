@@ -10,6 +10,7 @@ from app.db.mixins import TimestampMixin, UUIDPrimaryKeyMixin
 from app.models.enums import ProjectStatus
 
 if TYPE_CHECKING:
+    from app.models.compliance_document import ComplianceDocument
     from app.models.compliance_framework import ComplianceFramework
     from app.models.organization import Organization
     from app.models.user import User
@@ -81,4 +82,9 @@ class ComplianceProject(
 
     creator: Mapped["User"] = relationship(
         back_populates="created_compliance_projects",
+    )
+
+    documents: Mapped[list["ComplianceDocument"]] = relationship(
+        back_populates="project",
+        cascade="all, delete-orphan",
     )

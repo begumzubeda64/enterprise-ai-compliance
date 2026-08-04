@@ -2,6 +2,10 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.dependencies import get_db
+from app.dependencies.storage import get_storage_service
+from app.repositories.compliance_document_repository import (
+    ComplianceDocumentRepository,
+)
 from app.repositories.compliance_framework_repository import (
     ComplianceFrameworkRepository,
 )
@@ -12,23 +16,28 @@ from app.repositories.organization_repository import (
     OrganizationRepository,
 )
 from app.repositories.user_repository import UserRepository
+from app.services.compliance_document_service import (
+    ComplianceDocumentService,
+)
 from app.services.compliance_framework_service import (
     ComplianceFrameworkService,
 )
 from app.services.compliance_project_service import (
     ComplianceProjectService,
 )
+from app.services.document_processing_service import (
+    DocumentProcessingService,
+)
 from app.services.organization_service import OrganizationService
 from app.services.user_service import UserService
+from app.storage.base import BaseStorageService
 
 
 def get_user_service(
     db: AsyncSession = Depends(get_db),
 ) -> UserService:
-    repository = UserRepository(db)
-
     return UserService(
-        repository=repository,
+        repository=UserRepository(db),
         db=db,
     )
 
@@ -57,5 +66,20 @@ def get_compliance_project_service(
     return ComplianceProjectService(
         project_repository=ComplianceProjectRepository(db),
         framework_repository=ComplianceFrameworkRepository(db),
+        db=db,
+    )
+
+
+def get_compliance_document_service(
+    db: AsyncSession = Depends(get_db),
+    storage_service: BaseStorageService = Depends(
+        get_storage_service
+    ),
+) -> ComplianceDocumentService:
+    return ComplianceDocumentService(
+        document_repository=ComplianceDocumentRepository(db),
+        project_repository=ComplianceProjectRepository(db),
+        processing_service=DocumentProcessingService(),
+        storage_service=storage_service,
         db=db,
     )

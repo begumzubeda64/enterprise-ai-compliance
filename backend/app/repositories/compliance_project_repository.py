@@ -7,6 +7,10 @@ from app.models.compliance_project import ComplianceProject
 from app.repositories.base_repository import BaseRepository
 from app.schemas.common.pagination import PaginationParams
 
+from app.exceptions.compliance_project import (
+    ComplianceProjectNotFoundException,
+)
+
 
 class ComplianceProjectRepository(
     BaseRepository[ComplianceProject]
@@ -68,3 +72,17 @@ class ComplianceProjectRepository(
         )
 
         return projects, total or 0
+
+    async def get_required(
+        self,
+        project_id: UUID,
+    ) -> ComplianceProject:
+
+        project = await self.get_by_id(project_id)
+
+        if project is None:
+            raise ComplianceProjectNotFoundException(
+                project_id,
+            )
+
+        return project

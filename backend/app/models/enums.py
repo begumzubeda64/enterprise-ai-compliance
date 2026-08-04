@@ -20,3 +20,10 @@ class ProjectStatus(str, Enum):
     IN_REVIEW = "IN_REVIEW"
     COMPLETED = "COMPLETED"
     ARCHIVED = "ARCHIVED"
+
+
+class DocumentStatus(str, Enum):
+    UPLOADED = "UPLOADED"
+    EXTRACTING = "EXTRACTING"
+    READY = "READY"
+    FAILED = "FAILED"

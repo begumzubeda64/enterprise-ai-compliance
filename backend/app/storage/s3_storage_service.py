@@ -1,5 +1,6 @@
 import asyncio
 from typing import BinaryIO
+from uuid import UUID
 
 import boto3
 from botocore.client import BaseClient
@@ -10,7 +11,7 @@ from app.storage.base import BaseStorageService
 
 class S3StorageService(BaseStorageService):
     """
-    Storage adapter for private compliance documents in Amazon S3.
+    Amazon S3 implementation of the storage interface.
     """
 
     def __init__(self) -> None:
@@ -22,13 +23,32 @@ class S3StorageService(BaseStorageService):
         )
 
     async def verify_bucket_access(self) -> None:
-        """
-        Verify that the configured bucket exists and is accessible.
-        """
-
         await asyncio.to_thread(
             self.client.head_bucket,
             Bucket=self.bucket_name,
+        )
+
+    def generate_stored_filename(
+        self,
+        *,
+        document_id: UUID,
+        extension: str,
+    ) -> str:
+        return f"{document_id}{extension}"
+
+    def build_document_storage_key(
+        self,
+        *,
+        organization_id: UUID,
+        project_id: UUID,
+        document_id: UUID,
+        stored_filename: str,
+    ) -> str:
+        return (
+            f"organizations/{organization_id}/"
+            f"projects/{project_id}/"
+            f"documents/{document_id}/"
+            f"{stored_filename}"
         )
 
     async def upload_file(
@@ -39,10 +59,6 @@ class S3StorageService(BaseStorageService):
         content_type: str,
         metadata: dict[str, str] | None = None,
     ) -> None:
-        """
-        Upload a binary file-like object to the configured S3 bucket.
-        """
-
         extra_args: dict[str, object] = {
             "ContentType": content_type,
         }
@@ -62,10 +78,6 @@ class S3StorageService(BaseStorageService):
         self,
         object_key: str,
     ) -> None:
-        """
-        Delete an object from the configured S3 bucket.
-        """
-
         await asyncio.to_thread(
             self.client.delete_object,
             Bucket=self.bucket_name,
@@ -77,10 +89,6 @@ class S3StorageService(BaseStorageService):
         object_key: str,
         expires_in_seconds: int = 900,
     ) -> str:
-        """
-        Generate a temporary presigned URL for downloading an object.
-        """
-
         return await asyncio.to_thread(
             self.client.generate_presigned_url,
             "get_object",
